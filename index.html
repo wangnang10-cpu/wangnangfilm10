@@ -3,58 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WANG NANG 10 - เทศกาลภาพยนตร์</title>
+    <title>WANG NANG 10 | Official Website</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #0d0d0d; /* พื้นหลังสีดำ */
-            color: #eee; /* ตัวอักษรสีขาวเทา */
-            font-family: 'Sarabun', sans-serif;
-        }
-        .movie-card {
-            background-color: #1a1a1a; /* สีพื้นหลังของการ์ดหนัง */
-            border: 1px solid #333; /* ขอบสีเทาเข้ม */
-            transition: all 0.3s ease; /* เอฟเฟกต์เวลาเอาเมาส์ไปวาง */
-        }
-        .movie-card:hover {
-            border-color: #D4AF37; /* เปลี่ยนสีขอบเป็นสีทองเวลาเมาส์วาง */
-            transform: translateY(-5px); /* เลื่อนขึ้นเล็กน้อย */
-        }
+        :root { --gold: #D4AF37; --red: #8F0C0C; --black: #0d0d0d; }
+        body { background-color: var(--black); color: white; font-family: 'Sarabun', sans-serif; scroll-behavior: smooth; }
+        .font-cinema { font-family: 'Cinzel', serif; }
+        .movie-card { background: #151515; border: 1px solid #333; transition: 0.3s; height: 100%; display: flex; flex-direction: column; }
+        .movie-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .btn-gold { background-color: var(--gold); color: black; font-weight: bold; transition: 0.3s; cursor: pointer; }
+        .btn-gold:hover { background-color: #f1c40f; }
+        .hidden { display: none; }
+        img { background-color: #222; object-fit: cover; }
     </style>
 </head>
-<body class="pb-20">
+<body>
 
-    <header class="py-10 text-center border-b border-gray-800 bg-black">
-        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-[#D4AF37]">WANG NANG 10</h1>
-        <p class="text-xl text-gray-400 font-light">เทศกาลภาพยนตร์นิสิต ครั้งที่ 10</p>
+    <header class="p-6 bg-black flex justify-center items-center gap-6 md:gap-12 border-b border-gray-800 sticky top-0 z-50 shadow-2xl">
+        <img src="logo-uni.png" alt="University" class="h-10 md:h-14 object-contain">
+        <img src="logo-major.png" alt="Major" class="h-10 md:h-14 object-contain">
+        <img src="logo-group.png" alt="Group" class="h-10 md:h-14 object-contain">
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 mt-12">
-        <h2 class="text-2xl font-bold mb-8 text-white border-l-4 border-[#8F0C0C] pl-4">รายการภาพยนตร์ทั้งหมด (16 เรื่อง)</h2>
+    <section class="py-20 text-center px-6">
+        <h1 class="font-cinema text-5xl md:text-8xl text-[--gold] mb-4 tracking-widest drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]">WANG NANG 10</h1>
+        <p class="text-gray-400 tracking-[0.4em] uppercase text-sm md:text-lg">The Decade of Cinematic Excellence</p>
+        <div class="w-24 h-1 bg-[--red] mx-auto mt-8"></div>
+    </section>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-6 mb-20">
+        <h2 class="text-2xl font-bold mb-10 border-l-4 border-[--red] pl-4 uppercase tracking-widest">Official Selection</h2>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            
-            <div class="movie-card rounded-xl overflow-hidden shadow-lg">
-                <img src="poster1.jpg" alt="Poster 1" class="w-full h-[400px] object-cover bg-gray-900">
-                <div class="p-5 space-y-3">
-                    <h3 class="text-xl font-bold text-[#D4AF37] truncate">ชื่องาน/ชื่อเรื่องที่ 1</h3>
-                    <p class="text-xs text-gray-500 uppercase font-bold italic">จาก โปรดักชั่น A | ความยาว 15 นาที</p>
-                    <p class="text-sm text-gray-400 leading-relaxed line-clamp-3">เรื่องย่อโดยย่อของภาพยนตร์เรื่องที่ 1 จะแสดงตรงนี้ประมาณ 3 บรรทัด เพื่อให้การ์ดมีขนาดเท่ากัน...</p>
-                    <button class="w-full bg-[#D4AF37] text-black py-2 rounded-lg text-sm font-bold hover:bg-[#f1c40f]">ดูรายละเอียด/จองตั๋ว</button>
-                </div>
-            </div>
-            <div class="movie-card rounded-xl overflow-hidden shadow-lg">
-                <img src="poster2.jpg" alt="Poster 2" class="w-full h-[400px] object-cover bg-gray-900">
-                <div class="p-5 space-y-3">
-                    <h3 class="text-xl font-bold text-[#D4AF37] truncate">ชื่องาน/ชื่อเรื่องที่ 2</h3>
-                    <p class="text-xs text-gray-500 uppercase font-bold italic">จาก โปรดักชั่น B | ความยาว 20 นาที</p>
-                    <p class="text-sm text-gray-400 leading-relaxed line-clamp-3">เรื่องย่อโดยย่อของภาพยนตร์เรื่องที่ 2 จะแสดงตรงนี้ประมาณ 3 บรรทัด เพื่อให้การ์ดมีขนาดเท่ากัน...</p>
-                    <button class="w-full bg-[#D4AF37] text-black py-2 rounded-lg text-sm font-bold hover:bg-[#f1c40f]">ดูรายละเอียด/จองตั๋ว</button>
-                </div>
-            </div>
+        <div id="movie-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             </div>
     </main>
 
+    <div id="booking-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="bg-[#1a1a1a] w-full max-w-lg p-8 rounded-2xl border border-[--gold] relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">✕</button>
+            <h2 id="modal-title" class="text-3xl font-bold text-[--gold] mb-2"></h2>
+            <p id="modal-info" class="text-xs text-gray-500 mb-6 uppercase"></p>
+            
+            <form onsubmit="confirmBooking(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-sm mb-1 text-gray-400">ชื่อจริง - นามสกุล (ภาษาไทย)</label>
+                    <input type="text" id="user_name" required class="w-full bg-black border border-gray-700 p-4 rounded-xl outline-none focus:border-[--gold]">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-gray-400">เบอร์โทรศัพท์</label>
+                    <input type="tel" id="user_phone" required pattern="[0-9]{10}" placeholder="08xxxxxxxx" class="w-full bg-black border border-gray-700 p-4 rounded-xl outline-none focus:border-[--gold]">
+                </div>
+                <button type="submit" class="w-full btn-gold py-5 rounded-xl text-lg uppercase tracking-widest mt-4 shadow-lg">ยืนยันการจองตั๋ว</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="ticket-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4 bg-black backdrop-blur-xl">
+        <div class="max-w-lg w-full text-center">
+            <h2 class="text-2xl font-bold text-[--gold] mb-2">จองตั๋วสำเร็จ!</h2>
+            <p class="text-red-500 font-bold mb-6 text-sm underline animate-pulse">⚠️ กรุณาบันทึกภาพตั๋วใบนี้เพื่อยืนยันหน้างาน ⚠️</p>
+            
+            <div id="canvas-wrap" class="mb-8 rounded-lg overflow-hidden shadow-[0_0_40px_rgba(212,175,55,0.2)]">
+                <canvas id="ticket-canvas" class="w-full"></canvas>
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="downloadTicket()" class="flex-1 btn-gold py-4 rounded-xl">บันทึกภาพตั๋ว</button>
+                <button onclick="location.reload()" class="flex-1 bg-gray-800 py-4 rounded-xl">กลับหน้าหลัก</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลจำลองหนัง 16 เรื่อง
+        const movies = [
+            { id: 1, title: "Lusso & Piero", prod: "Cloudframe Studio", time: "15 นาที", desc: "เรื่องราวของจิตรกรหนุ่มผู้หลงใหลในแสงและเงา ค้นหาความทรงจำที่หายไปผ่านภาพวาด" },
+            { id: 2, title: "ฮอยขวัญ", prod: "Zumzam Prod.", time: "18 นาที", desc: "หนังสยองขวัญพื้นบ้าน เมื่อพิธีกรรมเรียกขวัญนำพาสิ่งที่ไม่คาดฝันกลับมาสู่หมู่บ้าน" },
+            { id: 3, title: "UNEARTH", prod: "MMRS Production", time: "20 นาที", desc: "การขุดค้นทางโบราณคดีที่นำไปสู่การค้นพบความลับอันน่าสะพรึงกลัวใต้ผืนดิน" },
+            { id: 4, title: "Echoes of Silence", prod: "Silent Hill", time: "12 นาที", desc: "สารคดีสะท้อนชีวิตคนไร้บ้านในเมืองหลวง ผ่านความเงียบงันที่คุณไม่เคยได้ยิน" },
+            { id: 5, title: "The Last Frame", prod: "Retro Lens", time: "15 นาที", desc: "ชายชราผู้ดูแลโรงหนังเก่ากำลังจะฉายหนังม้วนสุดท้ายในชีวิตท่ามกลางยุคสมัยที่เปลี่ยนไป" },
+            { id: 6, title: "Melody of June", prod: "Harmony Film", time: "14 นาที", desc: "ความรักที่จืดจางลงในฤดูฝน เมื่อเสียงเปียโนเป็นสิ่งเดียวที่เชื่อมโยงความรู้สึก" },
+            { id: 7, title: "Neon Nights", prod: "Cyber City", time: "16 นาที", desc: "ไซไฟระทึกขวัญ เมื่อเทคโนโลยีโคลนนิ่งถูกใช้ในทางที่ผิดใต้แสงสีนีออน" },
+            { id: 8, title: "กลิ่นดอกมะลิ", prod: "Jasmine House", time: "18 นาที", desc: "ดราม่าครอบครัวที่เล่าความสัมพันธ์แม่ลูกผ่านรสชาติของอาหารไทยแบบดั้งเดิม" },
+            { id: 9, title: "Under the Mask", prod: "Theater Arts", time: "15 นาที", desc: "เบื้องหลังเวทีโขนที่เต็มไปด้วยความริษยาและการแย่งชิงตำแหน่งตัวแสดงนำ" },
+            { id: 10, title: "Parallel", prod: "Paradox Film", time: "17 นาที", desc: "โลกคู่ขนานที่เชื่อมต่อกันผ่านตู้โทรศัพท์ ชายคนหนึ่งพยายามแก้ไขอดีตเพื่อคนรัก" },
+            { id: 11, title: "Journey Home", prod: "Nomad Prod.", time: "22 นาที", desc: "Road Movie ของพี่น้องที่ต้องนำอัฐิของพ่อกลับบ้านเกิดหลังไม่ได้คุยกันมา 10 ปี" },
+            { id: 12, title: "Pixel Heart", prod: "Indie Game", time: "10 นาที", desc: "แอนิเมชันของตัวละครเกม 8-bit ที่พยายามข้ามด่านไปบอกรักตัวละครในอีกเกม" },
+            { id: 13, title: "แดดสุดท้าย", prod: "Golden Hour", time: "13 นาที", desc: "การเผชิญหน้ากับความโดดเดี่ยวของหญิงชราในแฟลตที่กำลังจะถูกรื้อถอน" },
+            { id: 14, title: "Hidden Code", prod: "Dev Cinema", time: "16 นาที", desc: "โปรแกรมเมอร์พบรหัสลับในซอฟต์แวร์ที่อาจเปลี่ยนแปลงประวัติศาสตร์มนุษยชาติ" },
+            { id: 15, title: "The Script", prod: "Writers Block", time: "19 นาที", desc: "เมื่อชีวิตจริงของนักเขียนบทกำลังดำเนินไปตามบทหนังที่เขาเพิ่งเขียนจบอย่างประหลาด" },
+            { id: 16, title: "Memoirs", prod: "Memory Picture", time: "20 นาที", desc: "บันทึกของนิสิตวิชาภาพยนตร์ที่เล่าถึงอุปสรรคและความฝันในรอบ 10 ปีที่ผ่านมา" }
+        ];
+
+        // สร้างการ์ดหนังลงหน้าเว็บ
+        const grid = document.getElementById('movie-grid');
+        movies.forEach(m => {
+            grid.innerHTML += `
+                <div class="movie-card rounded-2xl overflow-hidden shadow-lg">
+                    <img src="poster${m.id}.jpg" alt="${m.title}" class="w-full h-[400px]">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-bold text-[--gold] mb-1">${m.title}</h3>
+                        <p class="text-[10px] text-gray-500 uppercase font-bold mb-3 italic">${m.prod} | ${m.time}</p>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-6 line-clamp-3">${m.desc}</p>
+                        <button onclick="openBooking('${m.title}', '${m.prod} | ${m.time}')" class="mt-auto w-full btn-gold py-3 rounded-xl text-sm uppercase">จองตั๋ว</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        function openBooking(title, info) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-info').innerText = info;
+            document.getElementById('booking-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        async function confirmBooking(e) {
+            e.preventDefault();
+            const name = document.getElementById('user_name').value;
+            const phone = document.getElementById('user_phone').value;
+            const ticketNo = "WN" + Math.floor(100 + Math.random() * 900); // จำลองเลขตั๋ว
+
+            const canvas = document.getElementById('ticket-canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.src = 'ticket-blank.png';
+
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                // วาดชื่อ (ปรับตำแหน่งตามรูปตั๋วของคุณ)
+                ctx.fillStyle = "white";
+                ctx.font = "bold 45px Sarabun";
+                ctx.fillText(name, 280, 440); 
+                
+                // วาดเลขตั๋ว
+                ctx.font = "bold 35px Sarabun";
+                ctx.fillText(ticketNo, 280, 500);
+
+                document.getElementById('booking-modal').classList.add('hidden');
+                document.getElementById('ticket-modal').classList.remove('hidden');
+            };
+            
+            img.onerror = () => {
+                alert("จองสำเร็จ แต่โหลดรูปตั๋วเปล่าไม่เจอ! กรุณาตรวจสอบชื่อไฟล์ ticket-blank.png ใน GitHub");
+            };
+        }
+
+        function downloadTicket() {
+            const canvas = document.getElementById('ticket-canvas');
+            const link = document.createElement('a');
+            link.download = 'WANGNANG-10-TICKET.png';
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        }
+    </script>
 </body>
 </html>
