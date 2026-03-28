@@ -3,102 +3,483 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WANG NANG 10 | Official</title>
+    <title>WANG NANG 10 | Velvet Oscar Edition</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --gold: #D4AF37; --red: #8F0C0C; --black: #0d0d0d; }
-        body { background-color: var(--black); color: white; font-family: 'Sarabun', sans-serif; }
-        .font-cinema { font-family: 'Cinzel', serif; }
-        .movie-card { background: #151515; border: 1px solid #333; transition: 0.3s; height: 100%; display: flex; flex-direction: column; }
-        .movie-card:hover { border-color: var(--gold); transform: translateY(-5px); }
-        .btn-gold { background-color: var(--gold); color: black; font-weight: bold; cursor: pointer; }
-        .hidden { display: none; }
+        :root { --gold: #d4af37; --gold-light: #f9d976; --black: #080808; }
+        body { background-color: var(--black); background-image: radial-gradient(circle at center, #1a0000 0%, var(--black) 100%); color: white; font-family: 'Anuphan', sans-serif; scroll-behavior: smooth; min-height: 100vh; }
+        .font-oscar { font-family: 'Playfair Display', serif; }
+        .font-th-title { font-weight: 700; }
+        
+        @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); } }
+
+        .slider { background: rgba(0, 0, 0, 0.3); border-top: 1px solid rgba(212, 175, 55, 0.1); border-bottom: 1px solid rgba(212, 175, 55, 0.1); height: 110px; margin: 40px auto; overflow: hidden; position: relative; display: flex; align-items: center; }
+        .slide-track { animation: scroll 40s linear infinite; display: flex; width: calc(150px * 34); }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-150px * 17)); } }
+        .slide { height: 100px; width: 150px; display: flex; align-items: center; justify-content: center; padding: 0 15px; }
+        .slide img { max-height: 75px; max-width: 130px; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(212, 175, 55, 0.2)); transition: transform 0.3s; }
+        .slide:hover img { transform: scale(1.15); }
+
+        .movie-card { background: linear-gradient(145deg, #111 0%, #000 100%); border: 2px solid #222; transition: all 0.4s; position: relative; overflow: hidden; border-radius: 12px; cursor: pointer; }
+        .movie-card:hover { border-color: var(--gold); box-shadow: 0 10px 40px rgba(212, 175, 55, 0.25); transform: translateY(-5px); }
+        .movie-card img { width: 100%; height: 400px; object-fit: contain; background-color: #000; }
+        .seat-badge { position: absolute; bottom: 10px; right: 10px; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.1); z-index: 10; }
+
+        .prod-text-premium { background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fcf6ba, #bf953f); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800; letter-spacing: 0.1em; background-size: 200% auto; animation: textShine 4s linear infinite; display: inline-block; }
+        @keyframes textShine { to { background-position: 200% center; } }
+
+        #synopsis-modal .synopsis-content { background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(5,5,5,0.98) 100%); backdrop-filter: blur(25px); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 32px; box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.1); }
+        .syn-sidebar { position: relative; }
+        @media (min-width: 768px) {
+            .syn-sidebar::after { content:''; position: absolute; right: 0; top: 10%; bottom: 10%; width: 1px; background: linear-gradient(to bottom, transparent, rgba(212,175,55,0.3), transparent); }
+        }
+        .syn-poster-frame { position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 20px rgba(212, 175, 55, 0.2); border: 2px solid rgba(255, 255, 255, 0.05); }
+        .syn-director-capsule { background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.2); padding: 8px 24px; border-radius: 100px; display: inline-block; }
+
+        .btn-oscar, .cr-btn { position: relative; overflow: hidden; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: linear-gradient(to bottom, var(--gold-light), var(--gold)); color: black; border: 1px solid #fff; }
+        .btn-oscar:hover, .cr-btn:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(212, 175, 55, 0.4); }
+        
+        #book-btn-direct { background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fcf6ba, #bf953f); background-size: 200% auto; color: #1a1a1a; font-weight: 900; padding: 18px; border-radius: 9999px; transition: all 0.4s; border: none; box-shadow: 0 10px 20px rgba(212,175,55,0.2); }
+        #book-btn-direct:hover { background-position: right center; transform: translateY(-4px); box-shadow: 0 15px 30px rgba(212,175,55,0.4); }
+
+        .input-premium { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.15); width: 100%; padding: 0.8rem; border-radius: 12px; color: white; outline: none; transition: all 0.3s ease; }
+        .input-premium:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2); }
+        select.input-premium option { background-color: #222 !important; color: #fff !important; }
+
+        .guest-entry { background: rgba(255,255,255,0.03); padding: 24px; border-radius: 20px; border-left: 3px solid var(--gold); margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+
+        #submit-btn { background: #eab308; color: black; border: none; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.3); }
+        #submit-btn:hover { background: #facc15; box-shadow: 0 6px 20px rgba(234, 179, 8, 0.5); }
+
+        .round-card-premium { position: relative; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-left: 4px solid var(--gold); border-radius: 20px; transition: all 0.4s; cursor: pointer; opacity: 0; transform: translateY(20px); }
+        .animate-round { animation: fadeInUp 0.5s forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        
+        .hidden { display: none !important; }
+
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 12px; }
+        .status-green { background-color: #4ade80; animation: pulse-green 2s infinite; }
+        .status-yellow { background-color: #fb923c; animation: pulse-yellow 1.5s infinite; }
+        .status-red { background-color: #ff4d4d; animation: pulse-red 1s infinite; }
+        
+        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6); } 50% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); } }
+        @keyframes pulse-yellow { 0%, 100% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.6); } 50% { box-shadow: 0 0 0 8px rgba(251, 146, 60, 0); } }
+        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.6); } 50% { box-shadow: 0 0 0 8px rgba(255, 77, 77, 0); } }
+
+        .save-btn-gold { background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fcf6ba, #bf953f); background-size: 200% auto; color: black; transition: 0.5s; box-shadow: 0 10px 20px rgba(212,175,55,0.2); }
+        .save-btn-gold:hover { background-position: right center; box-shadow: 0 15px 30px rgba(212,175,55,0.4); transform: translateY(-3px); }
+        
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
 <body class="pb-20">
 
-    <header class="p-6 bg-black flex justify-center items-center gap-6 md:gap-12 border-b border-gray-800 shadow-2xl">
-        <img src="logo-uni.png" onerror="this.style.display='none'" class="h-10 md:h-14 object-contain" alt="University">
-        <img src="logo-major.png" onerror="this.style.display='none'" class="h-10 md:h-14 object-contain" alt="Major">
-        <img src="logo-group.png" onerror="this.style.display='none'" class="h-10 md:h-14 object-contain" alt="Group">
+    <header class="p-3 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0 border-b-2 border-[--gold] sticky top-0 z-50 bg-black shadow-2xl">
+        <div class="flex items-center justify-center gap-2 md:gap-6 w-full md:w-auto"> 
+            <img src="logo-uni.png" class="h-6 md:h-11 object-contain">
+            <img src="logo-comarts.png" class="h-6 md:h-11 object-contain">
+            <img src="logo-major.png" class="h-6 md:h-11 object-contain">
+            <div class="h-6 md:h-8 w-[1px] bg-[--gold]/30"></div>
+            <img src="logo-wn10.png" class="h-8 md:h-12 object-contain -ml-2 md:-ml-10">
+            <img src="doubleclap.png" class="h-8 md:h-12 object-contain -m-2">
+        </div>
+        <div class="flex items-center justify-center gap-3 w-full md:w-auto">
+            <button onclick="openModal('check-ticket-modal')" class="text-white text-[10px] md:text-xs border border-white/50 px-3 py-2 rounded uppercase hover:bg-white/10 transition font-bold whitespace-nowrap">Check Ticket</button>
+            <button onclick="openRoundSelection()" class="btn-oscar text-xs md:text-sm px-4 md:px-6 py-2 md:py-2.5 rounded-full uppercase font-bold shadow-lg whitespace-nowrap">จองตั๋วภาพยนตร์</button>
+        </div>
     </header>
 
-    <section class="py-16 text-center">
-        <h1 class="font-cinema text-5xl md:text-7xl text-[--gold] mb-4 drop-shadow-2xl">WANG NANG 10</h1>
-        <p class="text-gray-400 tracking-[0.4em] uppercase text-[10px] md:text-sm">The Decade of Cinematic Excellence</p>
+    <section class="py-20 text-center px-6 relative overflow-hidden">
+        <img src="title-hero.png" class="max-w-[650px] w-[90%] mx-auto mb-6 mt-12">
+        <div class="slider"><div class="slide-track" id="slider-track"></div></div>
     </section>
 
-    <main class="max-w-7xl mx-auto px-6">
-        <h2 class="text-xl font-bold mb-10 border-l-4 border-[--red] pl-4 uppercase tracking-widest">Official Selection</h2>
-        <div id="movie-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            </div>
-    </main>
+    <main class="max-w-7xl mx-auto px-6 relative z-20"><div id="movie-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div></main>
 
-    <div id="booking-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="bg-[#1a1a1a] w-full max-w-md p-8 rounded-2xl border border-[--gold]">
-            <h2 id="modal-title" class="text-2xl font-bold text-[--gold] mb-6 text-center"></h2>
-            <form onsubmit="confirmBooking(event)" class="space-y-4">
-                <input type="text" id="user_name" placeholder="ชื่อจริง - นามสกุล" required class="w-full bg-black border border-gray-700 p-4 rounded-xl outline-none focus:border-[--gold] text-white">
-                <input type="tel" id="user_phone" placeholder="เบอร์โทรศัพท์" required class="w-full bg-black border border-gray-700 p-4 rounded-xl outline-none focus:border-[--gold] text-white">
-                <button type="submit" class="w-full btn-gold py-4 rounded-xl uppercase shadow-lg">ยืนยันการจองตั๋ว</button>
-                <button type="button" onclick="closeModal()" class="w-full text-gray-500 mt-2 text-sm">ยกเลิก</button>
+    <div id="synopsis-modal" class="fixed inset-0 z-[99999] hidden flex items-center justify-center p-4 backdrop-blur-md bg-black/80">
+        <div class="synopsis-content w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-y-auto md:overflow-hidden relative shadow-2xl custom-scroll">
+            <button onclick="closeModal('synopsis-modal')" class="absolute top-4 right-4 md:top-6 md:right-8 z-[100] text-gray-400 hover:text-[--gold] text-3xl transition duration-300 bg-black/50 md:bg-transparent rounded-full w-10 h-10 flex items-center justify-center md:w-auto md:h-auto">✕</button>
+            <div class="syn-sidebar w-full md:w-5/12 p-8 md:p-10 flex flex-col items-center border-b md:border-b-0 md:border-r border-white/5 bg-black/20">
+                <div class="syn-poster-frame w-2/3 max-w-[240px] md:max-w-none md:w-full aspect-[2/3] mb-6 md:mb-8 overflow-hidden">
+                    <img id="md-poster" src="" class="w-full h-full object-cover">
+                </div>
+                <div class="syn-info-stack text-center w-full flex flex-col items-center">
+                    <h2 id="md-title" class="text-2xl font-bold text-white mb-2 font-th-title tracking-tight w-full"></h2>
+                    <div class="w-full mb-4">
+                        <p id="md-prod" class="prod-text-premium text-xs uppercase tracking-[0.3em]"></p>
+                    </div>
+                    <div class="w-full mb-2">
+                        <div class="syn-director-capsule">
+                            <p id="md-director" class="text-gray-300 text-[11px] font-light"></p>
+                        </div>
+                    </div>
+                    <div class="text-sm space-y-1 pt-6 border-t border-white/5 w-full mt-6 mb-4 md:mb-0">
+                        <p id="md-len" class="text-gray-500 text-xs font-bold"></p>
+                        <p id="md-round" class="text-[--gold] text-sm font-semibold italic"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-7/12 p-8 md:p-14 overflow-visible md:overflow-y-auto custom-scroll flex flex-col bg-black/40 relative">
+                <h3 class="text-white font-th-title text-xl mb-6 border-l-4 border-[--gold] pl-4">Synopsis / เรื่องย่อ</h3>
+                <p id="md-desc" class="text-gray-300 text-sm md:text-base leading-loose font-light whitespace-pre-line italic mb-8"></p>
+                <div class="mt-auto pt-8 md:pt-12">
+                    <button id="book-btn-direct" class="btn-oscar w-full py-4 rounded-full font-black uppercase tracking-widest shadow-xl">จองตั๋วภาพยนตร์รอบนี้</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="booking-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="bg-[#121212] w-full max-w-xl rounded-[32px] border border-white/10 shadow-2xl overflow-hidden p-8 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scroll">
+            <div class="text-center border-b border-white/5 pb-4">
+                <h2 id="booking-title" class="text-4xl font-th-title text-white mb-1">จองตั๋ว</h2>
+                <p id="booking-info" class="text-[--gold] text-sm uppercase tracking-widest font-bold mt-2"></p>
+            </div>
+            <form onsubmit="confirmBooking(event)" id="booking-form" class="space-y-5">
+                <div class="space-y-2 bg-white/5 p-4 rounded-2xl">
+                    <label class="text-[11px] text-gray-400 uppercase ml-2 font-bold tracking-wider">จำนวนที่นั่ง (สูงสุด 5 ท่าน)</label>
+                    <select id="u_seats" class="input-premium font-bold text-lg" onchange="generateGuestFields(this.value)">
+                        <option value="1">1 ท่าน</option><option value="2">2 ท่าน</option><option value="3">3 ท่าน</option><option value="4">4 ท่าน</option><option value="5">5 ท่าน</option>
+                    </select>
+                </div>
+                <div id="guests-container" class="space-y-4"></div>
+                <div class="pt-4">
+                    <button type="submit" id="submit-btn" class="w-full py-4 rounded-2xl font-black text-lg uppercase transition-all duration-300">ยืนยันการจองทั้งหมด</button>
+                    <button type="button" onclick="closeModal('booking-modal')" class="w-full text-gray-500 hover:text-white text-xs text-center font-bold mt-4 transition-colors">Cancel</button>
+                </div>
             </form>
         </div>
     </div>
 
+    <div id="check-ticket-modal" class="fixed inset-0 z-[500] hidden flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
+        <div class="bg-[#0a0a0a] w-full max-w-md p-10 rounded-[40px] border-2 border-[--gold] text-center shadow-2xl">
+            <div class="space-y-6">
+                <h2 class="text-3xl font-th-title text-[--gold] mb-2">ตรวจสอบตั๋ว</h2>
+                <p class="text-gray-400 text-xs">กรอกเบอร์โทรเพื่อค้นหาตั๋วทุกรอบฉาย</p>
+                <input type="tel" id="check_phone" required class="input-premium text-center text-2xl tracking-widest" placeholder="0XXXXXXXXX" maxlength="10">
+                <button onclick="unifiedSearch()" class="bg-gradient-to-r from-[--gold] to-[--gold-light] text-black w-full py-4 rounded-xl font-bold uppercase transition active:scale-95 shadow-lg">ค้นหาตั๋วของฉัน</button>
+                <button onclick="closeModal('check-ticket-modal')" class="text-gray-500 text-xs uppercase mt-4 font-bold">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ticket-modal" class="fixed inset-0 z-[2000] hidden flex flex-col items-center p-0 bg-black/95 backdrop-blur-3xl overflow-y-auto custom-scroll">
+        <div class="w-full min-h-screen px-4 py-20 flex flex-col items-center">
+            <div class="mb-16 text-center animate-round">
+                <div class="inline-block px-6 py-2 border border-[--gold]/30 rounded-full mb-6 bg-black/50 backdrop-blur-md">
+                    <span class="text-[--gold] text-[10px] tracking-[0.4em] uppercase font-bold">Official Selection</span>
+                </div>
+                <h2 class="text-[--gold] font-th-title text-4xl md:text-6xl font-bold tracking-wider mb-4" style="text-shadow: 0 4px 20px rgba(212,175,55,0.4);">ตั๋วภาพยนตร์ของคุณ</h2>
+                <div class="flex items-center justify-center gap-4 mb-6">
+                    <div class="h-[1px] w-12 bg-gradient-to-r from-transparent to-[--gold]"></div>
+                    <svg class="w-4 h-4 text-[--gold]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    <div class="h-[1px] w-12 bg-gradient-to-l from-transparent to-[--gold]"></div>
+                </div>
+                <p class="text-gray-400 tracking-[0.15em] text-xs md:text-sm uppercase font-light max-w-md mx-auto leading-relaxed">กรุณาบันทึกภาพตั๋ว เพื่อใช้เป็นหลักฐานในการเข้าชม</p>
+            </div>
+            <div id="ticket-list" class="w-full max-w-5xl flex flex-col items-center"></div>
+            <div class="mt-20 pb-20 w-full max-w-xs text-center border-t border-white/10 pt-10">
+                <button onclick="location.reload()" class="w-full bg-transparent hover:bg-white/5 text-white/70 hover:text-white py-4 rounded-full border border-white/20 uppercase font-bold text-xs transition-all duration-300">เสร็จสิ้น (กลับหน้าแรก)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="round-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+        <div class="bg-[#0a0a0a] w-full max-w-2xl p-6 md:p-8 rounded-[40px] border border-white/10 shadow-2xl relative max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4 shrink-0">
+                <h2 class="text-2xl font-th-title text-[--gold] uppercase">Select Round</h2>
+                <button onclick="closeModal('round-modal')" class="text-gray-500 text-3xl">✕</button>
+            </div>
+            <div id="round-list" class="space-y-4 overflow-y-auto pr-3 custom-scroll flex-grow"></div>
+        </div>
+    </div>
+
     <script>
+        const firebaseConfig = { apiKey: "AIzaSyAldVZ_xe71PJ-FjlBPq12out8bqotE3Vg", authDomain: "wangnang-10.firebaseapp.com", databaseURL: "https://wangnang-10-default-rtdb.asia-southeast1.firebasedatabase.app/", projectId: "wangnang-10", storageBucket: "wangnang-10.firebasestorage.app", appId: "1:622552714532:web:1bdd8c5e5aa2d46e8cb7b1" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVl3PtMmM74d4nKFcPndt50ngy8zqunLpvgK410-JSz3px-65kb0zE7gcO_DKoHg6I/exec";
+
         const movies = [
-            { id: 1, title: "Lusso & Piero", prod: "Cloudframe Studio", time: "15 นาที", desc: "เรื่องราวของจิตรกรหนุ่มผู้หลงใหลในแสงและเงา" },
-            { id: 2, title: "ฮอยขวัญ", prod: "Zumzam Prod.", time: "18 นาที", desc: "หนังสยองขวัญพื้นบ้าน เมื่อพิธีกรรมเรียกขวัญนำพาสิ่งไม่คาดฝัน" },
-            { id: 3, title: "UNEARTH", prod: "MMRS Production", time: "20 นาที", desc: "การขุดค้นทางโบราณคดีที่นำไปสู่ความลับอันน่าสะพรึงกลัว" },
-            { id: 4, title: "Echoes of Silence", prod: "Silent Hill", time: "12 นาที", desc: "สารคดีสะท้อนชีวิตคนไร้บ้านในเมืองหลวง" },
-            { id: 5, title: "The Last Frame", prod: "Retro Lens", time: "15 นาที", desc: "ชายชราผู้ดูแลโรงหนังเก่ากับหนังม้วนสุดท้าย" },
-            { id: 6, title: "Melody of June", prod: "Harmony Film", time: "14 นาที", desc: "ความรักที่จืดจางลงในฤดูฝนกับเสียงเปียโน" },
-            { id: 7, title: "Neon Nights", prod: "Cyber City", time: "16 นาที", desc: "ไซไฟระทึกขวัญใต้แสงสีนีออน" },
-            { id: 8, title: "กลิ่นดอกมะลิ", prod: "Jasmine House", time: "18 นาที", desc: "ดราม่าครอบครัวผ่านรสชาติอาหารไทย" },
-            { id: 9, title: "Under the Mask", prod: "Theater Arts", time: "15 นาที", desc: "เบื้องหลังเวทีโขนที่เต็มไปด้วยความริษยา" },
-            { id: 10, title: "Parallel", prod: "Paradox Film", time: "17 นาที", desc: "โลกคู่ขนานที่เชื่อมต่อผ่านตู้โทรศัพท์" },
-            { id: 11, title: "Journey Home", prod: "Nomad Prod.", time: "22 นาที", desc: "Road Movie ของพี่น้องกับการนำอัฐิพ่อกลับบ้าน" },
-            { id: 12, title: "Pixel Heart", prod: "Indie Game", time: "10 นาที", desc: "แอนิเมชันตัวละครเกม 8-bit" },
-            { id: 13, title: "แดดสุดท้าย", prod: "Golden Hour", time: "13 นาที", desc: "การเผชิญหน้ากับความโดดเดี่ยวของหญิงชรา" },
-            { id: 14, title: "Hidden Code", prod: "Dev Cinema", time: "16 นาที", desc: "โปรแกรมเมอร์พบรหัสลับที่อาจเปลี่ยนประวัติศาสตร์" },
-            { id: 15, title: "The Script", prod: "Writers Block", time: "19 นาที", desc: "เมื่อชีวิตจริงดำเนินไปตามบทหนังที่เขียน" },
-            { id: 16, title: "Memoirs", prod: "Memory Picture", time: "20 นาที", desc: "บันทึกของนิสิตวิชาภาพยนตร์ในรอบ 10 ปี" }
+            { id: 1, title: "ฮอยขวัญ", prod: "Zumzam.production", len: "15:00", post: "poster1.jpg", round: "2", director: "พิมพิศา เหล่าชรา", desc: "เรื่องราววันธรรมดาในหมู่บ้านกลับกลายเป็นจุดเริ่มต้นของบางอย่างที่อธิบายไม่ได้ท่ามกลางทุ่งนาและความเชื่อพื้นถิ่น..." },
+            { id: 2, title: "สารคดีคนเก็บขยะ", prod: "Out Class", len: "15:00", post: "poster2.jpg", round: "4", director: "จักรพรรณ ตันยะกูล", desc: "แรงงานที่คนไม่เคยมอง คนเก็บขยะถือว่าเป็นแรงงานชายขอบที่ไร้ผู้คนเหลียวมองและไม่ให้ความสำคัญ สารคดีเรื่องนี้ จึงพาไปสำรวจแง่มุมสังคมที่ไม่เคยรับรู้" },
+            { id: 3, title: "Lusso & Piero", prod: "Cloudframe Studio", len: "15:05", post: "poster3.jpg", round: "2", director: "วิชวินทร์ คนชม", desc: "เรื่องราวของเด็กหนุ่ม “ลูซโซ่” ที่เข้าไปติดอยู่ในโลกของคนตายก่อนเวลาอันควร เขาได้เจอกับผีดิบตนหนึ่งที่อาสาจะเป็นวิญญาณนำทางให้กับเขา และลูซโซ่จึงได้ตั้งชื่อเขาว่า “ปิเอโร่”" },
+            { id: 4, title: "ขนิษฐา", prod: "Serendip production", len: "15:00", post: "poster4.jpg", round: "4", director: "ณฐรัตน์ หิรัญศิริ", desc: "เมื่อการจากมาของพี่สาวอย่าง “เจน” ทำให้ปมแค้นในอดีตของ “จ๋า” น้องสาว กลับมาอีกครั้ง การเผชิญหน้ากับความทรงจำที่บิดเบี้ยวและสายสัมพันธ์ของพี่น้องที่อาจไม่เคยมีอยู่จริง" },
+            { id: 5, title: "เชิด", prod: "MUD", len: "29.47", post: "poster5.jpg", round: "2", director: "นายนายวรวุฒิ สาวิสิทธิ์", desc: "ในคืนเทศกาลเชิดสิงโตอันครึกครื้น เหตุการณ์หนึ่งได้เปลี่ยนชีวิตของเด็กชายคนหนึ่งไปตลอดกาล หลายปีต่อมาเขาเติบโตขึ้นท่ามกลางคณะเชิดสิงโต พร้อมมิตรภาพ ความฝัน และแรงกดดันจากความเป็นจริงที่บีบให้ต้องเลือกเส้นทางชีวิตท่ามกลางการแข่งขัน ศักดิ์ศรี และความลับที่ค่อยๆ เปิดเผย เขาต้องตัดสินใจว่าอนาคตของตัวเองจะเดินไปในทิศทางใด" },
+            { id: 6, title: "เยาว์ fifteen,still youth", prod: "Deethangtakun", len: "30:00", post: "poster6.jpg", round: "3", director: "ศุภธิดา ฟูมะเฟือง", desc: "เรื่องของยูทูบเบอร์อย่าง “ม่านหมอก” ที่มีเหตุจำเป็นต้องกลับไปอยู่บ้านเกิด การกลับมาครั้งนี้พาให้เขาได้ย้อนไปหา “วัยเยาว์” มิตรภาพ ความรัก ความฝัน วันเวลาที่ต้องผันเปลี่ยน เขาจะเลือกจมอยู่กับอดีตหรือปั่นหัวใจให้ก้าวไปข้างหน้าอีกครั้ง" },
+            { id: 7, title: "Momories (วิมารดา)", prod: "105​ Production", len: "30:00", post: "poster7.jpg", round: "5", director: "ภารดร ทองพึ่งกลิ่น", desc: "\"ต้น\" หนุ่มฟรีแลนซ์ที่กลับบ้านมาใช้ชีวิตอยู่กับแม่หลังตัวเองตกงาน​ และรู้สึกว่าแม่ของตัวเองเปลี่ยนไป​ในช่วงเวลาที่เขากลับมาบ้าน​ เขาได้เห็นความเหงาและความรักที่แม่มีให้​ โดยไม่รู้ว่า​ที่ผ่านมาแม่เป็นอย่างไร​และมีเหตุไม่คาดคิดเกิดขึ้น​ ต้นต้องเผชิญ​กับ​ความจริงว่า​ \"บางสิ่งในชีวิตไม่มีวันย้อนกลับมาได้อีก\"" },
+            { id: 8, title: "The Coraeth เดอะ โคแรธ", prod: "Genzai Picture", len: "30:00", post: "poster8.jpg", round: "4", director: "สุพัชชา จันทบุรี", desc: "ในโลกที่สิ่งชีวิตหนึ่งถูกเรียกว่า “โคแรธ” หรือผู้ได้ยินเสียงหัวใจของคู่แท้ และโชคชะตาได้นำพาชายหญิงคู่หนึ่งที่มีความแตกต่างในเรื่องของความรักให้ได้มาพบกัน จากการพบกันซ้ำแล้วซ้ำเล่า เปลี่ยนความต่างให้กลายเป็นความผูกพัน ทว่าความจริงบางอย่างกลับทำให้ความรักครั้งนี้ไม่ควรเกิดขึ้น" },
+            { id: 9, title: "Blue's Redemption", prod: "WeCrazy Company", len: "30:00", post: "poster9.jpg", round: "5", director: "ภูมิรพี ไพรัมย์", desc: "\"เรื่องราวของบลู นักฆ่าหนุ่มที่ทำงานให้กับสังฆ์ มาเฟียผู้มีอิทธิพลกับเพื่อนของเขาเรด วันหนึ่งบลูเริ่มรู้สึกว่าตัวเองเริ่มด้านชากับชีวิตขึ้นไปทุกวันที่เขาทำงานจนเขาถูกสั่งให้ไปฆ่านักข่าวสาว แล้วความรู้สึกนั้นก็ทำให้เขาขัดคำสั่งนาย กลายเป็นคนทรยศในที่สุด\"" },
+            { id: 10, title: "ลาละ บาย..", prod: "PHNS", len: "30:00", post: "poster10.jpg", round: "1", director: "อรอนงค์ พนมเครือ", desc: "เรื่องราวของไออุ่นหญิงสาวนักเขียนบท ที่ได้กลับไปอยู่บ้านที่ชนบทเพื่อหาแรงบันดาลใจเขียนพล็อตเกี่ยวกับอาชีพที่คนไม่ค่อยนึกถึงเพื่อส่งงานประกวด ถ้าชนะเขาจะได้ไปทำงานกับทีมต่างประเทศ ในระหว่างนั้นเขาก็ได้ใช้ชีวิตอยู่ที่บ้าน ไปช่วยพ่อทำงานเก็บของเก่าบ้าง จนได้ค้นพบวิถีชีวิตที่แสนสงบ จึงเกิดคำถามกับตัวเองว่า \"ความฝันที่เคยชอบ ปัจจุบันยังใช่อยู่หรือเปล่า\"" },
+            { id: 11, title: "JOE THE BROKE AND THE BLACK GLASSES", prod: "แสงมาลี film", len: "30:01", post: "poster11.jpg", round: "5", director: "ศรัณย์ ฉ่ำแก้ว", desc: "อดีตนักมวยตกอับรับจ้างสารพัด ถูกชายใส่แว่นดำลึกลับว่าจ้างให้คุ้มกันไปส่งของสำคัญด้วยการ “เดินเท้า” ผ่านเมืองที่ไม่เป็นมิตรนัก ระหว่างทาง ทั้งคู่ต้องเจอกับเจ้าหนี้ ปากหมาเจ้าถิ่น และบาดแผลในใจที่คอยกัดกินไม่แพ้อันตรายรอบตัวการเดินทางสั้นๆ ครั้งนี้จึงกลายเป็นบททดสอบศักดิ์ศรีของคนถังแตกสองคน ที่อาจได้อะไรบางอย่างกลับมามากกว่าเงินค่าจ้าง." },
+            { id: 12, title: "Echoes Of Pain", prod: "Echo Film Production", len: "30:01", post: "poster12.jpg", round: "4", director: "ปริยากร นามวงค์", desc: "หลังการสูญเสียแม่ที่ไม่มีวันย้อนคืน เด็กคนหนึ่งต้องเติบโตท่ามกลางความเจ็บปวดเมื่อโลกไม่เคยมอบความอ่อนโยนให้เขา “ความรัก” จึงกลายเป็นแสงสว่างเดียวของเขา แต่เมื่อได้รับความผิดหวังอีกครั้ง ทุกอย่างจึงนำพาไปสู่การตัดสินใจที่ไม่มีวันหวนย้อนคืนได้อีก" },
+            { id: 13, title: "The Last Secret รักนี้มีราก", prod: "Lanfilm", len: "30:00", post: "poster13.jpg", round: "3", director: "ชนิดา พรรณหาญ", desc: "เมื่อโลกต้องเผชิญกับการระบาดของเชื้อปริศนาจากผักที่ค่อยๆ งอกงามในร่างกายมนุษย์ เด็กหนุ่มผู้แพ้ผักอย่างรุนแรงกลับกลายเป็นกุญแจสำคัญในการช่วยโลก และต้องเผชิญหน้ากับความจริงของหัวใจตนเองก่อนทุกอย่างจะสายเกินไป" },
+            { id: 14, title: "UNEARTH", prod: "MMRS PRODUCTION", len: "44:27", post: "poster14.jpg", round: "3", director: "อธิป พิชัย", desc: "“ เมื่อความศรัทธาที่เคยยึดมั่นกลับกลายเป็นอาวุธที่หันมาทำร้าย เอวาร์ และ ลีโอ คู่รักที่ต้องเผชิญกับปีศาจร้ายในบ้านที่เต็มไปด้วยความทรงจำ เอวาร์จึงต้องรับมือกับพลังงานลึกลับที่ทวีความรุนแรงจนเกินต้านทาน เธอจึงต้องย้อนรอยอดีตบรรพบุรุษเพื่อค้นหาคำตอบจากพระเจ้าที่ตนนับถือ ท่ามกลางวิกฤตที่บีบให้เลือกระหว่างการยอมรับชะตากรรมหรือลุกขึ้นต่อต้านความกลัวในจิตใต้สำนึก เพื่อเอาชีวิตรอดจากหายนะที่ไม่อาจคาดเดา ”" },
+            { id: 15, title: "บ้านใหญ่", prod: "ODYSSEY", len: "44:54", post: "poster15.jpg", round: "2", director: "ธนภัทร แสงส่ง", desc: "ปี พ.ศ. 2556 ประเทศไทยกําลังเผชิญความปั่นป่วนทางการเมืองระดับชาติ การชุมนุม การต่อรองอํานาจ และการยุบสภากําลังจะเกิดขึ้น ขณะเดียวกันในเมืองเล็กๆ แห่งหนึ่ง การเมืองท้องถิ่นก็เดือดไม่แพ้กัน อํานาจ เงิน และ อิทธิพล ถูกช่วงชิงกันโดย “บ้านใหญ่” ที่ครอบงําชีวิตผู้คนมานาน คืนหนึ่งในงานเลี้ยงต้อนรับผู้ใหญ่บ้านคนใหม่ ท่ามกลางเสียงดนตรี และผู้คนที่กําลังเฉลิมฉลอง เด็กพิเศษคนหนึ่งชื่อ น้อย ผู้มีอาการ PTSD จากเหตุการณ์รุนแรงในอดีต ลั่นไกปืนยิงนักการเมืองท้องถิ่นผู้ทรงอิทธิพลเสียชีวิตต่อหน้าสาธารณชน ความโกลาหลปะทุขึ้นทันที" },
+            { id: 16, title: "UNDER THE SAME ROOF", prod: "FINE FILM PRODUCTION", len: "45:00", post: "poster16.jpg", round: "1", director: "อาณัฐ สิริทรัพย์นพคุณ", desc: "ชายชนชั้นกลางหวังฮุบมรดกบ้านเพื่อนําเงินไปใช้หนี้และกู้คืนความยอมรับในสังคมถูกขัดขวางโดยน้องชายร่วมสายเลือดแต่การได้มาซึ่งบ้านกลับมีราคาที่ต้องจ่าย" }
         ];
 
-        const grid = document.getElementById('movie-grid');
-        movies.forEach(m => {
-            // แก้ไขตรงนี้ให้ตรงกับชื่อไฟล์ใน GitHub ของคุณ Oak
-            const posterSrc = `poster${m.id}.jpg.jpg`; 
-            
-            grid.innerHTML += `
-                <div class="movie-card rounded-2xl overflow-hidden shadow-lg">
-                    <img src="${posterSrc}" alt="${m.title}" class="w-full h-[400px] object-cover">
-                    <div class="p-5 flex flex-col flex-grow">
-                        <h3 class="text-lg font-bold text-[--gold] mb-1">${m.title}</h3>
-                        <p class="text-[10px] text-gray-500 mb-3">${m.prod} | ${m.time}</p>
-                        <p class="text-xs text-gray-400 line-clamp-3 mb-6">${m.desc}</p>
-                        <button onclick="openBooking('${m.title}')" class="mt-auto w-full btn-gold py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-[#f1c40f] transition">จองตั๋ว</button>
-                    </div>
-                </div>
-            `;
-        });
+        let currentRoundID = null;
+        let currentRoundTime = null; 
 
-        function openBooking(title) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('booking-modal').classList.remove('hidden');
+        function init() {
+            const track = document.getElementById('slider-track');
+            let sliderHTML = ''; const v = new Date().getTime();
+            for(let i=1; i<=17; i++) { sliderHTML += `<div class="slide"><img src="prod${i}.png?v=${v}" onerror="this.src='prod${i}.PNG?v=${v}'"></div>`; }
+            track.innerHTML = sliderHTML + sliderHTML;
+
+            const grid = document.getElementById('movie-grid');
+            movies.forEach(m => {
+                const rInfo = {1:"10:45 - 12:00", 2:"12:15 - 14:00", 3:"14:15 - 16:00", 4:"16:15 - 18:00", 5:"18:45 - 21:00"};
+                grid.innerHTML += `
+                    <div class="movie-card flex flex-col h-full" onclick="openSynopsis(${m.id})">
+                        <img src="${m.post}?v=${v}" onerror="this.src='https://via.placeholder.com/400x560/222/D4AF37?text=WN10'">
+                        <div id="badge-movie-${m.id}" class="seat-badge">Loading...</div>
+                        <div class="p-6 flex flex-col flex-grow bg-black/60">
+                            <h3 class="text-xl font-bold text-white mb-1 truncate font-th-title">${m.title}</h3>
+                            <p class="text-[11px] font-bold uppercase mb-4 prod-text-premium">${m.prod}</p>
+                            <div class="mt-auto text-xs text-gray-400 font-bold"><p>ความยาว: ${m.len} นาที</p><p class="text-[--gold]">รอบ : ${m.round} เวลา : ${rInfo[m.round]}</p></div>
+                        </div>
+                    </div>`;
+                db.ref(`capacities/round${m.round}`).on('value', snap => {
+                    const maxSeats = (m.round == 1) ? 187 : 200;
+                    const left = maxSeats - (snap.val() || 0);
+                    const badge = document.getElementById(`badge-movie-${m.id}`);
+                    if(badge) {
+                        let color = left <= 20 ? "#ff4d4d" : (left <= 100 ? "#fb923c" : "#4ade80");
+                        badge.style.color = color; badge.innerHTML = `Seats: ${left <= 0 ? 'FULL' : left}`;
+                    }
+                });
+            });
         }
 
-        function closeModal() {
-            document.getElementById('booking-modal').classList.add('hidden');
+        window.openSynopsis = function(id) {
+            const m = movies.find(x => x.id === id);
+            const rInfo = {1:"10:45 - 12:00", 2:"12:15 - 14:00", 3:"14:15 - 16:00", 4:"16:15 - 18:00", 5:"18:45 - 21:00"};
+            document.getElementById('md-poster').src = m.post;
+            document.getElementById('md-title').innerText = m.title;
+            document.getElementById('md-prod').innerText = m.prod;
+            document.getElementById('md-director').innerText = `กำกับโดย : ${m.director}`;
+            document.getElementById('md-len').innerText = `ความยาว: ${m.len} นาที`;
+            document.getElementById('md-round').innerText = `รอบที่ ${m.round} เวลา : ${rInfo[m.round]}`;
+            document.getElementById('md-desc').innerText = m.desc;
+            document.getElementById('book-btn-direct').onclick = function() { closeModal('synopsis-modal'); selectRound(parseInt(m.round), rInfo[m.round]); };
+            openModal('synopsis-modal');
+        };
+
+        function generateGuestFields(count) {
+            const container = document.getElementById('guests-container');
+            container.innerHTML = '';
+            for(let i=1; i<=count; i++) {
+                container.innerHTML += `
+                    <div class="guest-entry relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-[--gold]"></div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-6 h-6 rounded-full bg-[--gold]/20 text-[--gold] flex items-center justify-center text-xs font-bold">${i}</div>
+                            <p class="text-white text-xs font-bold uppercase tracking-wider">รายละเอียดผู้เข้าชม ${i==1 ? '<span class="text-[--gold] ml-1">(ผู้จองหลัก)</span>' : ''}</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div class="space-y-1">
+                                <label class="text-[9px] text-gray-500 uppercase font-bold tracking-widest pl-1">ประเภท</label>
+                                <select id="type_${i}" onchange="toggleGuestType(${i}, this.value)" class="input-premium text-sm font-semibold">
+                                    <option value="บุคคลทั่วไป">👤 บุคคลทั่วไป</option>
+                                    <option value="นักศึกษา">🎓 นักศึกษา</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] text-gray-500 uppercase font-bold tracking-widest pl-1">คำนำหน้า</label>
+                                <select id="p${i}" class="input-premium text-sm font-semibold">
+                                    <option>นาย</option>
+                                    <option>นาง</option>
+                                    <option>นางสาว</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="space-y-1 mb-4">
+                            <label class="text-[9px] text-gray-500 uppercase font-bold tracking-widest pl-1">ชื่อ - นามสกุล</label>
+                            <input type="text" id="n${i}" required class="input-premium text-sm" placeholder="กรอกชื่อและนามสกุล">
+                        </div>
+                        <div id="s${i}_fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-white/5 p-4 rounded-xl border border-white/5">
+                            <div class="space-y-1">
+                                <label class="text-[9px] text-[--gold] uppercase font-bold tracking-widest pl-1">รหัสนักศึกษา</label>
+                                <input type="text" id="sid${i}" class="input-premium text-sm" placeholder="Ex. 65123456789">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] text-[--gold] uppercase font-bold tracking-widest pl-1">สถาบัน</label>
+                                <input type="text" id="aca${i}" class="input-premium text-sm" placeholder="ระบุชื่อสถาบัน">
+                            </div>
+                        </div>
+                        ${i==1 ? `
+                        <div class="space-y-1 mt-6 border-t border-white/10 pt-4">
+                            <label class="text-[10px] text-[--gold] uppercase font-bold tracking-widest pl-1 flex items-center gap-2">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                เบอร์โทรศัพท์สำหรับรับตั๋ว (10 หลัก)
+                            </label>
+                            <input type="tel" id="u_phone" required pattern="[0-9]{10}" class="input-premium text-lg font-bold tracking-widest" placeholder="0XXXXXXXXX">
+                        </div>` : ''}
+                    </div>`;
+            }
         }
 
-        function confirmBooking(e) {
+        function toggleGuestType(idx, type) { document.getElementById(`s${idx}_fields`).classList.toggle('hidden', type !== 'นักศึกษา'); }
+
+        async function confirmBooking(e) {
             e.preventDefault();
-            alert("จองสำเร็จ! (ระบบจำลอง)");
-            closeModal();
+            const btn = document.getElementById('submit-btn');
+            try {
+                const count = parseInt(document.getElementById('u_seats').value);
+                const phone = document.getElementById('u_phone').value;
+                btn.disabled = true; btn.innerText = "กำลังดำเนินการ...";
+                const snapCheck = await db.ref(`bookings/${phone}/R${currentRoundID}`).once('value');
+                if(snapCheck.exists()) { 
+                    alert("เบอร์นี้ได้จองรอบนี้ไปแล้ว!"); 
+                    btn.disabled = false; btn.innerText="ยืนยันการจองทั้งหมด"; 
+                    return; 
+                }
+                db.ref(`capacities/round${currentRoundID}`).transaction(curr => {
+                    const currentSeats = curr || 0;
+                    const maxForThisRound = (currentRoundID == 1) ? 187 : 200;
+                    return (currentSeats + count <= maxForThisRound) ? currentSeats + count : undefined;
+                }, async (err, comm, snapCap) => {
+                    try {
+                        if (err) {
+                            alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่");
+                            btn.disabled = false; btn.innerText="ยืนยันการจองทั้งหมด";
+                        } else if (!comm) {
+                            alert("ขออภัย! ที่นั่งในรอบนี้ไม่เพียงพอ");
+                            btn.disabled = false; btn.innerText="ยืนยันการจองทั้งหมด";
+                        } else {
+                            let tickets = [];
+                            for(let i=1; i<=count; i++) {
+                                const type = document.getElementById(`type_${i}`).value; 
+                                const data = { 
+                                    name: document.getElementById(`n${i}`).value, 
+                                    prefix: document.getElementById(`p${i}`).value, 
+                                    userType: type, 
+                                    studentID: document.getElementById(`sid${i}`)?.value || "-", 
+                                    academy: document.getElementById(`aca${i}`)?.value || "-", 
+                                    phone: phone, 
+                                    round: currentRoundID, 
+                                    ticketID: `WN-R${currentRoundID}-${String(snapCap.val()-(count-i)).padStart(3,'0')}`, 
+                                    seats: count 
+                                };
+                                tickets.push(data); 
+                                fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) }).catch(e => console.log("Sheet Error:", e));
+                            }
+                            await db.ref(`bookings/${phone}/R${currentRoundID}`).set({ group: tickets }); 
+                            showMultiTickets(tickets); 
+                        }
+                    } catch(innerErr) {
+                        console.error(innerErr);
+                        alert("เกิดข้อผิดพลาดภายใน: " + innerErr.message);
+                        btn.disabled = false; btn.innerText="ยืนยันการจองทั้งหมด";
+                    }
+                });
+            } catch(error) {
+                console.error(error);
+                alert("เกิดข้อผิดพลาดในระบบ: " + error.message);
+                btn.disabled = false; btn.innerText="วยืนยันการจองทั้งหมด";
+            }
         }
+
+        async function unifiedSearch() {
+            const phone = document.getElementById('check_phone').value;
+            if(!phone || phone.length < 10) return alert("กรุณากรอกเบอร์โทรศัพท์ 10 หลักให้ครบถ้วน");
+            const snap = await db.ref(`bookings/${phone}`).once('value');
+            if(!snap.exists()) return alert("ไม่พบข้อมูลการจองสำหรับเบอร์นี้");
+            let allTickets = [];
+            snap.forEach(roundSnap => { allTickets = allTickets.concat(roundSnap.val().group); });
+            showMultiTickets(allTickets);
+        }
+
+        function showMultiTickets(tickets) {
+            const container = document.getElementById('ticket-list'); 
+            container.innerHTML = '';
+            tickets.forEach((t, i) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = "flex flex-col items-center relative gap-6 w-full max-w-4xl";
+                const canvas = document.createElement('canvas');
+                canvas.id = `ticket-canvas-${i}`;
+                canvas.className = "w-full rounded-lg shadow-[0_25px_50px_-12px_rgba(0,0,0,1)] relative z-10 transition-transform duration-700 hover:scale-[1.02]";
+                const saveBtn = document.createElement('button');
+                saveBtn.className = "bg-gradient-to-r from-[--gold] to-[--gold-light] text-black px-10 py-4 rounded-full font-bold text-sm tracking-widest shadow-xl transition-all active:scale-95 flex items-center gap-2";
+                saveBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> บันทึกตั๋วภาพยนตร์ใบที่ ${i+1}`;
+                saveBtn.onclick = () => {
+                    const link = document.createElement('a');
+                    link.download = `WN10_Ticket_${t.ticketID}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+                const divider = document.createElement('div');
+                divider.className = "w-full max-w-md h-[1px] bg-gradient-to-r from-transparent via-[--gold] to-transparent opacity-30 mt-6 mb-2";
+                wrapper.appendChild(canvas);
+                wrapper.appendChild(saveBtn);
+                if (i < tickets.length - 1) wrapper.appendChild(divider);
+                container.appendChild(wrapper);
+                renderTicketOnCanvas(canvas, t);
+            });
+            closeModal('booking-modal'); closeModal('check-ticket-modal'); openModal('ticket-modal');
+            const btn = document.getElementById('submit-btn');
+            if(btn) { btn.disabled = false; btn.innerText="ยืนยันการจองทั้งหมด"; }
+        }
+
+        function renderTicketOnCanvas(canvas, data) {
+            const ctx = canvas.getContext('2d'), img = new Image();
+            img.src = `ticket-${data.round}.png?v=` + new Date().getTime(); 
+            img.onload = () => {
+                canvas.width = 1200; canvas.height = 492;
+                ctx.drawImage(img, 0, 0, 1200, 492);
+                ctx.fillStyle = (data.round == 2) ? "black" : "white"; 
+                ctx.textBaseline = "middle"; 
+                ctx.textAlign = "left"; 
+                ctx.font = "bold 20px Anuphan"; 
+                ctx.fillText(data.name || "-", 460, 215, 200); 
+                ctx.font = "bold 20px Anuphan"; 
+                ctx.fillText(data.ticketID || "-", 660, 215); 
+                ctx.font = "bold 22px Anuphan"; 
+                ctx.fillText(data.phone || "-", 460, 290); 
+            };
+            img.onerror = () => {
+                canvas.width = 1200; canvas.height = 492;
+                ctx.fillStyle = "#1a1a1a"; ctx.fillRect(0, 0, 1200, 492);
+                ctx.fillStyle = "white"; ctx.font = "bold 40px Anuphan";
+                ctx.fillText(`! ไม่สามารถโหลดไฟล์: ticket-${data.round}.png`, 300, 200);
+            };
+        }
+
+        function openRoundSelection() {
+            const list = document.getElementById('round-list'); list.innerHTML = '';
+            const times = {1:"10:45 - 12:00", 2:"12:15 - 14:00", 3:"14:15 - 16:00", 4:"16:15 - 18:00", 5:"18:45 - 21:00"};
+            [1,2,3,4,5].forEach((rid, index) => {
+                const moviesInRound = movies.filter(m => m.round == rid).map(m => m.title);
+                db.ref(`capacities/round${rid}`).on('value', snap => {
+                    const maxForThisRound = (rid == 1) ? 187 : 200;
+                    const left = maxForThisRound - (snap.val() || 0);
+                    const isFull = left <= 0;
+                    let dotClass = isFull ? "bg-gray-500" : (left > 100 ? "status-green" : (left > 20 ? "status-yellow" : "status-red"));
+                    let textColor = isFull ? "#6b7280" : (left > 100 ? "#4ade80" : (left > 20 ? "#fb923c" : "#ff4d4d"));
+                    const card = document.createElement('div'); 
+                    card.className = `round-card-premium p-6 flex justify-between items-center animate-round ${isFull ? 'opacity-40 grayscale cursor-not-allowed' : ''}`;
+                    card.style.animationDelay = `${index * 0.1}s`; 
+                    if(!isFull) card.onclick = () => selectRound(rid, times[rid]); 
+                    card.innerHTML = `<div class="flex-1"><p class="text-white font-bold text-xl mb-1 flex items-center"><span class="status-dot ${dotClass}"></span>ROUND 0${rid} <span class="text-[--gold] text-sm ml-2 font-normal italic">${times[rid]}</span></p><p class="text-[11px] text-gray-300 italic line-clamp-2 max-w-sm pl-6">${moviesInRound.join(", ")}</p></div><div class="text-right pl-6 border-l border-white/10 shrink-0"><p class="text-3xl font-oscar font-bold" style="color: ${textColor}">${isFull ? 'FULL' : left}</p><p class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Seats Left</p></div>`;
+                    const exist = document.getElementById(`rcard-${rid}`); 
+                    if(exist) exist.replaceWith(card); else list.appendChild(card); card.id = `rcard-${rid}`;
+                });
+            });
+            openModal('round-modal');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); if(id==='booking-modal') generateGuestFields(1); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function selectRound(id, time) { currentRoundID = id; currentRoundTime = time; document.getElementById('booking-info').innerText = `กำลังจอง : ROUND 0${id} (${time})`; closeModal('round-modal'); openModal('booking-modal'); }
+        window.onload = init;
     </script>
 </body>
 </html>
